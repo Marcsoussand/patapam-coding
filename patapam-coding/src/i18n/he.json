@@ -1,0 +1,36 @@
+{
+  "nav": {
+    "home": "בית"
+  },
+  "home": {
+    "title": "פטפם קודינג",
+    "subtitle": "לומדים לתכנת ונהנים!",
+    "locked": "נעול",
+    "tutorial": "מדריך",
+    "hero1": "טרטוף",
+    "hero2": "פטפם",
+    "hero3": "דולפינו",
+    "complete_previous": "!השלם את השלב הקודם כדי לפתוח"
+  },
+  "game": {
+    "tutorial_label": "מדריך",
+    "level": "שלב",
+    "available_actions": "פעולות זמינות",
+    "your_sequence": "הרצף שלך",
+    "run": "▶ קדימה!",
+    "stop": "⏹ עצור",
+    "retry": "נסה שוב",
+    "replay": "שחק שוב",
+    "next_level": "שלב הבא →",
+    "success": "!מולסון מצליח 🎉",
+    "failure": "!אוי לא, נסה שוב 💥",
+    "tutorial_complete": "!המדריך הושלם 🏆",
+    "drop_here": "!גרור את הפעולות לכאן",
+    "clear_sequence": "נקה הכל"
+  },
+  "actions": {
+    "move_forward": "התקדם",
+    "turn_left": "פנה שמאלה",
+    "turn_right": "פנה ימינה"
+  }
+}

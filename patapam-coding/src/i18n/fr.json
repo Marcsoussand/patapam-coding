@@ -1,0 +1,36 @@
+{
+  "nav": {
+    "home": "Accueil"
+  },
+  "home": {
+    "title": "Patapam Coding",
+    "subtitle": "Apprends à coder en t'amusant !",
+    "locked": "Verrouillé",
+    "tutorial": "Tutoriel",
+    "hero1": "Tartuffe",
+    "hero2": "Patapam",
+    "hero3": "Dauphinou",
+    "complete_previous": "Termine l'étape précédente pour débloquer !"
+  },
+  "game": {
+    "tutorial_label": "Tutoriel",
+    "level": "Niveau",
+    "available_actions": "Actions disponibles",
+    "your_sequence": "Ta séquence",
+    "run": "▶ Lancer !",
+    "stop": "⏹ Arrêter",
+    "retry": "Réessayer",
+    "replay": "Rejouer",
+    "next_level": "Niveau suivant →",
+    "success": "🎉 Bravo Mollasson !",
+    "failure": "💥 Raté ! Réessaie !",
+    "tutorial_complete": "🏆 Tutoriel terminé !",
+    "drop_here": "Glisse tes actions ici !",
+    "clear_sequence": "Tout effacer"
+  },
+  "actions": {
+    "move_forward": "Avancer",
+    "turn_left": "Tourner à gauche",
+    "turn_right": "Tourner à droite"
+  }
+}
