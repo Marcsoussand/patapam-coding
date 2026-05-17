@@ -1,0 +1,93 @@
+{
+  "nav": {
+    "home": "Home"
+  },
+  "home": {
+    "title": "Patapam Coding",
+    "subtitle": "Learn to code while having fun!",
+    "locked": "Locked",
+    "tutorial": "Tutorial",
+    "hero1": "Tartuffe",
+    "hero2": "Patapam",
+    "hero3": "Dauphinou",
+    "complete_previous": "Complete the previous step to unlock!"
+  },
+  "game": {
+    "tutorial_label": "Tutorial",
+    "level": "Level",
+    "available_actions": "Available actions",
+    "your_sequence": "Your sequence",
+    "run": "▶ Go!",
+    "stop": "⏹ Stop",
+    "retry": "Try again",
+    "replay": "Replay",
+    "next_level": "Next level →",
+    "success": "🎉 Well done {{heroName}}!",
+    "failure": "💥 Oops! Try again!",
+    "tutorial_complete": "🏆 Tutorial complete!",
+    "mollasson_done": "Mollasson has nothing more to teach you!\nDo you want to play with Tartuffe now?",
+    "play_tartuffe": "Play with Tartuffe →",
+    "drop_here": "Drag your actions here!",
+    "clear_sequence": "Clear all"
+  },
+  "actions": {
+    "up": "Up",
+    "down": "Down",
+    "left": "Left",
+    "right": "Right",
+    "swim": "Swim",
+    "jump": "Jump",
+    "dive": "Dive",
+    "super_jump": "Super jump"
+  },
+  "levels": {
+    "tuto1": {
+      "title": "Straight ahead!",
+      "description": "Help Mollasson slide down the branch to the end."
+    },
+    "tuto2": {
+      "title": "The bend",
+      "description": "The branch turns! Mollasson must go down then right."
+    },
+    "tuto3": {
+      "title": "Two turns",
+      "description": "Two turns for Mollasson — down, right, down!"
+    },
+    "tuto4": {
+      "title": "Obstacles!",
+      "description": "Leaves and knots block the path! Find the right route."
+    },
+    "tuto5": {
+      "title": "Against the flow",
+      "description": "Sometimes you have to go left to move forward! Help Mollasson find the way."
+    },
+    "tuto6": {
+      "title": "The secret key",
+      "description": "The door is locked! Find the hidden key before reaching the exit."
+    },
+    "tartuffe1": {
+      "title": "The snowy forest",
+      "description": "Two locks on the path! Find both keys to clear the way."
+    },
+    "dauphinou1": {
+      "title": "Swim with Dauphinou",
+      "description": "One action is missing to cross the sea. Do you know which one?"
+    },
+    "dauphinou2": {
+      "title": "The first obstacle",
+      "description": "A rock blocks the surface. Jump over it and dive back!"
+    },
+    "dauphinou3": {
+      "title": "The palm tree",
+      "description": "A big palm tree on its island is blocking the path. Dive, pass underneath, then jump back up!"
+    },
+    "dauphinou4": {
+      "title": "Rock and palm tree",
+      "description": "First a rock, then an island with a palm tree. Jump over one, dive under the other!"
+    }
+  },
+  "error": {
+    "title": "💥 Patapam got lost",
+    "retry": "Back to home"
+  }
+}
