@@ -1,54 +1,77 @@
 import type { HeroPos, ActionId, CellType, Direction } from '../types/game'
 
-const DIRECTION_ORDER: Direction[] = ['up', 'right', 'down', 'left']
-
-function turnRight(direction: Direction): Direction {
-  const idx = DIRECTION_ORDER.indexOf(direction)
-  return DIRECTION_ORDER[(idx + 1) % 4]
+// Maps any ActionId to a Direction for sprite selection
+const ACTION_DIRECTION: Record<ActionId, Direction> = {
+  up: 'up', down: 'down', left: 'left', right: 'right',
+  swim: 'right', jump: 'up', dive: 'down', super_jump: 'up',
 }
 
-function turnLeft(direction: Direction): Direction {
-  const idx = DIRECTION_ORDER.indexOf(direction)
-  return DIRECTION_ORDER[(idx + 3) % 4]
+const KEY_COLOR: Partial<Record<CellType, string>> = {
+  key_red: 'red',
+  key_yellow: 'yellow',
 }
 
-function getNextPos(row: number, col: number, direction: Direction): { row: number; col: number } {
-  switch (direction) {
-    case 'up':    return { row: row - 1, col }
-    case 'down':  return { row: row + 1, col }
-    case 'left':  return { row, col: col - 1 }
-    case 'right': return { row, col: col + 1 }
-  }
+const DOOR_COLOR: Partial<Record<CellType, string>> = {
+  door_red: 'red',
+  door_yellow: 'yellow',
 }
 
 export function executeStep(
   heroPos: HeroPos,
   actionId: ActionId,
-  grid: CellType[][]
-): { heroPos: HeroPos; valid: boolean } {
-  const { row, col, direction } = heroPos
+  grid: CellType[][],
+  collectedKeys: string[],
+  surfaceRow?: number
+): { heroPos: HeroPos; valid: boolean; collectedKey: string | null } {
+  const { row, col } = heroPos
 
-  if (actionId === 'turn_left') {
-    return { heroPos: { row, col, direction: turnLeft(direction) }, valid: true }
-  }
-  if (actionId === 'turn_right') {
-    return { heroPos: { row, col, direction: turnRight(direction) }, valid: true }
-  }
-  if (actionId === 'move_forward') {
-    const next = getNextPos(row, col, direction)
-    if (
-      next.row < 0 || next.row >= grid.length ||
-      next.col < 0 || next.col >= grid[0].length
-    ) {
-      return { heroPos, valid: false }
+  let nextRow = row
+  let nextCol = col
+  switch (actionId) {
+    case 'up':         nextRow = row - 1; break
+    case 'down':       nextRow = row + 1; break
+    case 'left':       nextCol = col - 1; break
+    case 'right':      nextCol = col + 1; break
+    case 'swim':{
+      // Gravity: if above surface, fall back down while moving forward
+      if (surfaceRow !== undefined && row < surfaceRow) {
+        nextRow = row + 1
+      }
+      nextCol = col + 1
+      break
     }
-    const cell = grid[next.row][next.col]
-    if (cell === 'wall') {
-      return { heroPos, valid: false }
-    }
-    return { heroPos: { row: next.row, col: next.col, direction }, valid: true }
+    case 'jump':       nextRow = row - 1; nextCol = col + 1; break
+    case 'dive':       nextRow = row + 1; nextCol = col + 1; break
+    case 'super_jump': nextRow = row - 2; nextCol = col + 1; break
   }
-  return { heroPos, valid: false }
+
+  if (
+    nextRow < 0 || nextRow >= grid.length ||
+    nextCol < 0 || nextCol >= grid[0].length
+  ) {
+    return { heroPos, valid: false, collectedKey: null }
+  }
+
+  const cell = grid[nextRow][nextCol]
+  if (cell === 'wall' || cell === 'palm_tree') {
+    return { heroPos, valid: false, collectedKey: null }
+  }
+
+  // Porte : bloquée si la clé correspondante n'a pas été ramassée
+  const doorColor = DOOR_COLOR[cell]
+  if (doorColor !== undefined && !collectedKeys.includes(doorColor)) {
+    return { heroPos, valid: false, collectedKey: null }
+  }
+
+  // Clé : ramassée si on marche dessus et qu'on ne l'a pas encore
+  const keyColor = KEY_COLOR[cell]
+  const collectedKey = keyColor !== undefined && !collectedKeys.includes(keyColor) ? keyColor : null
+
+  return {
+    heroPos: { row: nextRow, col: nextCol, direction: ACTION_DIRECTION[actionId] },
+    valid: true,
+    collectedKey,
+  }
 }
 
 export function isEndCell(row: number, col: number, grid: CellType[][]): boolean {

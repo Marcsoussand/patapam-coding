@@ -22,15 +22,72 @@
     "retry": "Réessayer",
     "replay": "Rejouer",
     "next_level": "Niveau suivant →",
-    "success": "🎉 Bravo Mollasson !",
+    "success": "🎉 Bravo {{heroName}} !",
     "failure": "💥 Raté ! Réessaie !",
     "tutorial_complete": "🏆 Tutoriel terminé !",
+    "mollasson_done": "Mollasson n'a plus rien à t'apprendre !\nTu veux jouer avec Tartuffe maintenant ?",
+    "play_tartuffe": "Jouer avec Tartuffe →",
     "drop_here": "Glisse tes actions ici !",
     "clear_sequence": "Tout effacer"
   },
   "actions": {
-    "move_forward": "Avancer",
-    "turn_left": "Tourner à gauche",
-    "turn_right": "Tourner à droite"
+    "up": "Haut",
+    "down": "Bas",
+    "left": "Gauche",
+    "right": "Droite",
+    "swim": "Nage",
+    "jump": "Saut",
+    "dive": "Plongeon",
+    "super_jump": "Super saut"
+  },
+  "levels": {
+    "tuto1": {
+      "title": "Tout droit !",
+      "description": "Aide Mollasson à descendre la branche jusqu'au bout."
+    },
+    "tuto2": {
+      "title": "Le coude",
+      "description": "La branche tourne ! Mollasson doit aller en bas puis à droite."
+    },
+    "tuto3": {
+      "title": "Deux virages",
+      "description": "Deux virages pour Mollasson — bas, droite, bas !"
+    },
+    "tuto4": {
+      "title": "Les obstacles",
+      "description": "Des feuilles et des nœuds bloquent le chemin ! À toi de trouver la bonne route."
+    },
+    "tuto5": {
+      "title": "À contre-courant",
+      "description": "Parfois il faut aller à gauche pour avancer ! Aide Mollasson à trouver son chemin."
+    },
+    "tuto6": {
+      "title": "La clé secrète",
+      "description": "La porte est verrouillée ! Trouve la clé cachée avant d'atteindre la sortie."
+    },
+    "tartuffe1": {
+      "title": "La forêt enneigée",
+      "description": "Deux serrures sur le chemin ! Trouve les deux clés pour ouvrir la voie."
+    },
+    "dauphinou1": {
+      "title": "Nage avec Dauphinou",
+      "description": "Il manque une action pour traverser la mer. Tu sais laquelle ?"
+    },
+    "dauphinou2": {
+      "title": "Le premier obstacle",
+      "description": "Un rocher bloque la surface. Saute par-dessus et replonge !"
+    },
+    "dauphinou3": {
+      "title": "Le palmier",
+      "description": "Un grand palmier sur son île bloque le chemin. Plonge, passe par en dessous, puis remonte !"
+    },
+    "dauphinou4": {
+      "title": "Rocher et palmier",
+      "description": "D'abord un rocher, ensuite une île avec un palmier. Saute par-dessus, puis plonge en dessous !"
+    }
+  },
+  "error": {
+    "title": "💥 Patapam s'est perdu",
+    "retry": "Revenir à la page d'accueil"
   }
 }

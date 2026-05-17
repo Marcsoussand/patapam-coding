@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useState, Fragment } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useGame } from '../context/GameContext'
-import { TUTORIAL_LEVELS, ACTIONS } from '../data/levels'
+import { ACTIONS } from '../data/levels'
+import ActionIcon from './ActionIcon'
 import type { ActionId } from '../types/game'
 
 interface DragData {
@@ -11,10 +12,9 @@ interface DragData {
 }
 
 export default function Sequencer() {
-  const { state, dispatch } = useGame()
+  const { state, dispatch, currentLevel } = useGame()
   const { t } = useTranslation()
-  const { sequence, status, executionIndex, failedStep, currentLevelIndex } = state
-  const level = TUTORIAL_LEVELS[currentLevelIndex]
+  const { sequence, status, executionIndex, failedStep } = state
   const isRunning = status === 'running'
   const [dropOverIdx, setDropOverIdx] = useState<number | null>(null)
 
@@ -67,13 +67,123 @@ export default function Sequencer() {
     }
   }
 
-  const isLastLevel = currentLevelIndex >= TUTORIAL_LEVELS.length - 1
+  const isLastLevel = false // handled in GamePage success modal
 
+  // ── Mode slots fixes (Dauphinou side-scroll) ──────────────────────
+  const isPrefill = !!currentLevel.prefillSequence && !!state.displaySlots
+  if (isPrefill) {
+    const displaySlots = state.displaySlots!
+    const prefillSeq   = currentLevel.prefillSequence!
+    // Map executionIndex (counts non-null slots executed) to a slot index
+    const activeSlotIdx = status === 'running'
+      ? (() => { let c = 0; for (let i = 0; i < displaySlots.length; i++) { if (displaySlots[i] !== null) { if (c === executionIndex) return i; c++ } } return -1 })()
+      : -1
+
+    return (
+      <div className="sequencer">
+        <div className="seq-header">
+          <span className="seq-title">{t('game.your_sequence')}</span>
+          <span className="seq-count">{sequence.length} / {currentLevel.maxActions}</span>
+          {!isRunning && displaySlots.some((s, i) => s !== null && prefillSeq[i] === null) && (
+            <button
+              className="clear-btn"
+              onClick={() => dispatch({ type: 'CLEAR_SEQUENCE' })}
+              title={t('game.clear_sequence')}
+            >🗑</button>
+          )}
+        </div>
+        <div className="sequence-strip sequence-strip--fixed">
+          {displaySlots.map((slotAction, idx) => {
+            const isLocked  = prefillSeq[idx] !== null
+            const isEmpty   = slotAction === null
+            const isActive  = idx === activeSlotIdx
+            const isDone    = isActive ? false : (() => { let c = 0; for (let i = 0; i < idx; i++) { if (displaySlots[i] !== null) c++ } return c < executionIndex && ['running','success','failure'].includes(status) })()
+            const isFailed  = status === 'failure' && idx === activeSlotIdx
+
+            if (isEmpty) {
+              return (
+                <div
+                  key={idx}
+                  className={`seq-slot seq-slot--empty ${dropOverIdx === idx ? 'seq-slot--dragover' : ''}`}
+                  onDragOver={e => { e.preventDefault(); setDropOverIdx(idx) }}
+                  onDragLeave={() => setDropOverIdx(null)}
+                  onDrop={e => {
+                    e.preventDefault(); setDropOverIdx(null)
+                    const data: DragData = JSON.parse(e.dataTransfer.getData('text/plain'))
+                    if (data.source === 'panel' && data.actionId) {
+                      dispatch({ type: 'ADD_ACTION', actionId: data.actionId, index: idx })
+                    } else if (data.source === 'sequencer' && data.index !== undefined) {
+                      // Move from a user slot to this empty slot
+                      const fromIdx = data.index
+                      if (fromIdx !== idx) {
+                        const moved = displaySlots[fromIdx]
+                        if (moved !== null && prefillSeq[fromIdx] === null) {
+                          dispatch({ type: 'REMOVE_ACTION', index: fromIdx })
+                          dispatch({ type: 'ADD_ACTION', actionId: moved, index: idx })
+                        }
+                      }
+                    }
+                  }}
+                >
+                  <span className="seq-slot-placeholder">?</span>
+                </div>
+              )
+            }
+
+            const action = ACTIONS[slotAction!]
+            return (
+              <div
+                key={idx}
+                className={[
+                  'seq-slot',
+                  isLocked  ? 'seq-slot--locked' : 'seq-slot--user',
+                  isActive  ? 'seq-active' : '',
+                  isDone    ? 'seq-done' : '',
+                  isFailed  ? 'seq-failed' : '',
+                ].filter(Boolean).join(' ')}
+                title={t('actions.' + slotAction)}
+                draggable={!isLocked && !isRunning}
+                onDragStart={e => {
+                  if (isLocked) return
+                  e.dataTransfer.effectAllowed = 'move'
+                  e.dataTransfer.setData('text/plain', JSON.stringify({ source: 'sequencer', index: idx }))
+                }}
+              >
+                <span className="seq-item-icon"><ActionIcon actionId={slotAction!} /></span>
+                {!isLocked && !isRunning && (
+                  <button
+                    className="remove-btn-slot"
+                    onClick={e => { e.stopPropagation(); dispatch({ type: 'REMOVE_ACTION', index: idx }) }}
+                    title="Enlever"
+                  >✕</button>
+                )}
+              </div>
+            )
+          })}
+        </div>
+        <div className="sequencer-controls">
+          {status === 'idle' && (
+            <button className="btn-run" onClick={() => dispatch({ type: 'RUN' })} disabled={sequence.length === 0}>
+              {t('game.run')}
+            </button>
+          )}
+          {status === 'running' && (
+            <button className="btn-reset" onClick={() => dispatch({ type: 'RESET' })}>{t('game.stop')}</button>
+          )}
+          {(status === 'success' || status === 'failure') && (
+            <button className="btn-reset" onClick={() => dispatch({ type: 'RESET' })}>{t('game.replay')}</button>
+          )}
+        </div>
+      </div>
+    )
+  }
+
+  // ── Mode libre (Mollasson / Tartuffe) ─────────────────────────────
   return (
     <div className="sequencer">
-      <h3>
-        {t('game.your_sequence')}
-        <span className="seq-count">{sequence.length} / {level.maxActions}</span>
+      <div className="seq-header">
+        <span className="seq-title">{t('game.your_sequence')}</span>
+        <span className="seq-count">{sequence.length} / {currentLevel.maxActions}</span>
         {sequence.length > 0 && !isRunning && (
           <button
             className="clear-btn"
@@ -83,10 +193,10 @@ export default function Sequencer() {
             🗑
           </button>
         )}
-      </h3>
+      </div>
 
       <div
-        className="sequence-zone"
+        className="sequence-strip"
         onDragOver={handleContainerDragOver}
         onDragLeave={handleContainerDragLeave}
         onDrop={handleContainerDrop}
@@ -102,30 +212,30 @@ export default function Sequencer() {
           const isFailed = status === 'failure' && idx === failedStep
 
           return (
-            <div key={idx}>
+            <Fragment key={idx}>
               <div
-                className={`drop-zone ${dropOverIdx === idx ? 'drop-zone--active' : ''}`}
+                className={`drop-zone-h ${dropOverIdx === idx ? 'drop-zone-h--active' : ''}`}
                 onDragOver={e => handleDropZoneDragOver(e, idx)}
                 onDragLeave={handleDropZoneDragLeave}
                 onDrop={e => handleDropZoneDrop(e, idx)}
               />
               <div
-                className={['sequence-item', isActive ? 'seq-active' : '', isDone ? 'seq-done' : '', isFailed ? 'seq-failed' : ''].filter(Boolean).join(' ')}
+                className={['seq-item', isActive ? 'seq-active' : '', isDone ? 'seq-done' : '', isFailed ? 'seq-failed' : ''].filter(Boolean).join(' ')}
                 draggable={!isRunning}
                 onDragStart={e => handleItemDragStart(e, idx)}
+                title={t('actions.' + actionId)}
               >
-                <span className={`action-icon${action.iconBg ? ' action-icon--blue' : ''}`}>{action.icon}</span>
-                <span className="action-label">{t('actions.' + actionId)}</span>
+                <span className="seq-item-icon">{action.icon}</span>
                 {!isRunning && (
-                  <button className="remove-btn" onClick={() => dispatch({ type: 'REMOVE_ACTION', index: idx })}>×</button>
+                  <button className="remove-btn-sm" onClick={() => dispatch({ type: 'REMOVE_ACTION', index: idx })}>×</button>
                 )}
               </div>
-            </div>
+            </Fragment>
           )
         })}
 
         <div
-          className={`drop-zone ${dropOverIdx === sequence.length ? 'drop-zone--active' : ''}`}
+          className={`drop-zone-h ${dropOverIdx === sequence.length ? 'drop-zone-h--active' : ''}`}
           onDragOver={e => handleDropZoneDragOver(e, sequence.length)}
           onDragLeave={handleDropZoneDragLeave}
           onDrop={e => handleDropZoneDrop(e, sequence.length)}
@@ -142,19 +252,12 @@ export default function Sequencer() {
           <button className="btn-reset" onClick={() => dispatch({ type: 'RESET' })}>{t('game.stop')}</button>
         )}
         {status === 'success' && (
-          <>
-            <div className="status-msg status-success">{t('game.success')}</div>
-            {!isLastLevel
-              ? <button className="btn-next" onClick={() => dispatch({ type: 'NEXT_LEVEL' })}>{t('game.next_level')}</button>
-              : <div className="status-msg" style={{ color: '#ffd700' }}>{t('game.tutorial_complete')}</div>
-            }
-            <button className="btn-reset" onClick={() => dispatch({ type: 'RESET' })}>{t('game.replay')}</button>
-          </>
+          <button className="btn-reset" onClick={() => dispatch({ type: 'RESET' })}>{t('game.replay')}</button>
         )}
         {status === 'failure' && (
           <>
             <div className="status-msg status-failure">{t('game.failure')}</div>
-            <button className="btn-reset" onClick={() => dispatch({ type: 'RESET' })}>{t('game.retry')}</button>
+            <button className="btn-reset" onClick={() => dispatch({ type: 'RESET' })}>↺ {t('game.retry')}</button>
           </>
         )}
       </div>

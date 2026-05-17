@@ -9,8 +9,9 @@ export default function App() {
     <BrowserRouter>
       <NavBar />
       <Routes>
-        <Route path="/"     element={<HomePage />} />
-        <Route path="/play" element={<GamePage />} />
+        <Route path="/"           element={<HomePage />} />
+        <Route path="/play/:hero" element={<GamePage />} />
+        <Route path="/play"       element={<GamePage />} />
       </Routes>
     </BrowserRouter>
   )
